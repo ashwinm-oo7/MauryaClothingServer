@@ -32,19 +32,27 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 // Parse JSON request bodies
 app.use(bodyParser.json());
 // Middleware
+const allowedOrigins = [
+  "https://maurya-clothing.vercel.app",
+  "https://maurya-clothing-ashwinm-oo7s-projects.vercel.app",
+];
+
 const corsOptions = {
-  origin: 'https://maurya-clothing.vercel.app', // Allow only your frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS' ],
-  allowedHeaders: ['Content-Type', 'Authorization' ,
-                   "Accept", 
-                  ],
-  credentials: true, 
+  origin: (origin, callback) => {
+    if (allowedOrigins.includes(origin) || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
 
 
-app.use(cors(corsOptions));
 
 app.use("/user", userRoutes);
 app.use("/category", categoryRoutes);
