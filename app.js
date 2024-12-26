@@ -33,20 +33,15 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(bodyParser.json());
 // Middleware
 const corsOptions = {
-  origin: '*', // Allows all domains
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow these HTTP methods
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Methods",
-  ],
-  preflightContinue: false, // Stop OPTIONS request from continuing to other routes
-  optionsSuccessStatus: 204, // Response status for successful OPTIONS request
-  credentials: true, // Allow cookies and credentials (if needed)
+  origin: 'https://maurya-clothing.vercel.app', // Allow only your frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'], // Do NOT include 'Access-Control-Allow-Origin'
+  credentials: true, // Allow cookies if needed
 };
 
-app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));
+
+
 app.use(cors(corsOptions));
 
 app.use("/user", userRoutes);
