@@ -32,7 +32,15 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 // Parse JSON request bodies
 app.use(bodyParser.json());
 // Middleware
-app.use(cors()); // Enable CORS for all routes
+const corsOptions = {
+  origin: '*', // Allows all domains
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow these HTTP methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+  credentials: true, // Allow cookies and credentials (if needed)
+};
+
+app.use(cors(corsOptions));
+
 app.use("/user", userRoutes);
 app.use("/category", categoryRoutes);
 app.use("/subcategory", subCategoryRoutes);
