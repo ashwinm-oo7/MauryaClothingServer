@@ -21,7 +21,7 @@
     "twilio": "^5.0.4",
     "ws": "^8.18.0",
       "@types/node": "^20.12.8",
-  "nodemon": "^2.0.22",
+  "nodemon": "^2.0.22"
   },
   "name": "start",
   "version": "1.0.0",
