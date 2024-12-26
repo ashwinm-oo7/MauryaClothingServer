@@ -3,7 +3,6 @@ const router = express.Router();
 const db = require("../../db");
 const { ObjectId } = require("mongodb");
 const nodemailer = require("nodemailer");
-const htmlToPdf = require("html-pdf");
 
 // Route to add payment details
 router.post("/add", async (req, res) => {
