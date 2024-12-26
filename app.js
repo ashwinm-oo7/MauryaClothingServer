@@ -34,7 +34,7 @@ app.use(bodyParser.json());
 // Middleware
 const corsOptions = {
   origin: 'https://maurya-clothing.vercel.app', // Allow only your frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'    "Accept", ],
   allowedHeaders: ['Content-Type', 'Authorization'], // Do NOT include 'Access-Control-Allow-Origin'
   credentials: true, // Allow cookies if needed
 };
