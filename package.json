@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "maurya-clothing",
   "version": "0.1.0",
   "private": true,
@@ -18,38 +17,8 @@
     "react-scripts": "5.0.1",
     "react-switch": "^7.1.0",
     "react-toastify": "^8.0.0",
-    "web-vitals": "^2.1.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
-=======
-  "dependencies": {
+    "web-vitals": "^2.1.4",
     "@redis/client": "^1.6.0",
-    "axios": "^1.7.9",
     "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -75,26 +44,33 @@
     "nodemon": "^3.0.1",
     "ws": "^8.18.0"
   },
-  "name": "start",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-<<<<<<< HEAD
-    "start": "nodemon app.js",
-    "dev": "nodemon app.js"
-
-=======
-    "dev": "nodemon app.js",   
-    "start": "nodemon app.js"
->>>>>>> f4fee186bbdc12997c063ed2c8b9ecf0c17b6651
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/node": "^20.12.8"
->>>>>>> 771aaa3087617322c91040c794a2f421742d7044
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "dev": "nodemon app.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }
