@@ -35,10 +35,18 @@ app.use(bodyParser.json());
 const corsOptions = {
   origin: '*', // Allows all domains
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow these HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Access-Control-Allow-Headers",
+    "Access-Control-Allow-Methods",
+  ],
+  preflightContinue: false, // Stop OPTIONS request from continuing to other routes
+  optionsSuccessStatus: 204, // Response status for successful OPTIONS request
   credentials: true, // Allow cookies and credentials (if needed)
 };
 
+app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
 
 app.use("/user", userRoutes);
