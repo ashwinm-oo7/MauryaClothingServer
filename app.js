@@ -52,6 +52,11 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.get("/test-cors", (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.send("CORS is working!");
+});
+
 
 
 app.use("/user", userRoutes);
