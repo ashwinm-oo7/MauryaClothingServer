@@ -349,7 +349,7 @@ router.put("/updateReviews", async (req, res) => {
       console.log("Same rating, no update needed");
       return res.status(200).json({ message: "Same rating, no update needed" });
     }
-    // Update the review's rating
+    // Update the review's ratin
     const updatedReview = await reviewCollection.updateOne(
       { _id: existingReview._id },
       {
@@ -455,43 +455,43 @@ router.get("/getAllReviews", async (req, res) => {
       }
     });
 
-    // const processedReviews = await Promise.all(
-    //   userReviews.map(async (review) => {
-    //     if (
-    //       Array.isArray(review.reviewImages) &&
-    //       review.reviewImages.length > 0
-    //     ) {
-    //       review.reviewImages = await Promise.all(
-    //         review.reviewImages.map(async (media) => {
-    //           try {
-    //             if (allowedImageFormats.includes(media.type)) {
-    //               return {
-    //                 ...media,
-    //                 dataURL: await getBase64Image(media.filePath),
-    //               };
-    //             } else if (allowedVideoFormats.includes(media.type)) {
-    //               return {
-    //                 ...media,
-    //                 dataURL: await getBase64Video(media.filePath),
-    //               };
-    //             } else {
-    //               return media; // Return unchanged for unsupported formats
-    //             }
-    //           } catch (error) {
-    //             console.error(`Error processing media: ${error.message}`);
-    //             return {
-    //               ...media,
-    //               dataURL: null, // Set null in case of error
-    //             };
-    //           }
-    //         })
-    //       );
-    //     } else {
-    //       review.reviewImages = []; // Default to an empty array
-    //     }
-    //     return review;
-    //   })
-    // );
+    const processedReviews = await Promise.all(
+      userReviews.map(async (review) => {
+        if (
+          Array.isArray(review.reviewImages) &&
+          review.reviewImages.length > 0
+        ) {
+          review.reviewImages = await Promise.all(
+            review.reviewImages.map(async (media) => {
+              try {
+                if (allowedImageFormats.includes(media.type)) {
+                  return {
+                    ...media,
+                    dataURL: await getBase64Image(media.filePath),
+                  };
+                } else if (allowedVideoFormats.includes(media.type)) {
+                  return {
+                    ...media,
+                    dataURL: await getBase64Video(media.filePath),
+                  };
+                } else {
+                  return media; // Return unchanged for unsupported formats
+                }
+              } catch (error) {
+                console.error(`Error processing media: ${error.message}`);
+                return {
+                  ...media,
+                  dataURL: null, // Set null in case of error
+                };
+              }
+            })
+          );
+        } else {
+          review.reviewImages = []; // Default to an empty array
+        }
+        return review;
+      })
+    );
 
     // setCache(queryCacheKey, processedReviews);
 
