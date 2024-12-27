@@ -141,6 +141,10 @@ router.post("/add", async (req, res) => {
 });
 
 router.get("/getAllProducts", async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "https://maurya-clothing.vercel.app");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
   try {
     const { id } = req.query;
     const isAdmin = req.query.isAdmin === "true";
