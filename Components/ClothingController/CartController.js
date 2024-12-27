@@ -288,10 +288,13 @@ router.get("/getIdCart", async (req, res) => {
           return null; // Skip if the size does not exist for the selected color
         }
 
-        const productImagesWithBase64 = product.productImages.map((image) => ({
-          ...image,
-          dataURL: getBase64Image(image.filePath),
-        }));
+
+        const productImagesWithBase64 = await Promise.all(
+          product.productImages.map(async (image) => ({
+            ...image,
+            dataURL: await getBase64Image(image.filePath),
+          }))
+        );
 
         return {
           variant: selectedSizeDetails,
