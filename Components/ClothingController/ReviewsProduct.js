@@ -493,7 +493,7 @@ router.get("/getAllReviews", async (req, res) => {
       })
     );
     // setCache(queryCacheKey, processedReviews);
-
+console.log(processedReviews);
     res.status(200).json(processedReviews);
   } catch (error) {
     console.error("Error fetching user reviews:", error);
