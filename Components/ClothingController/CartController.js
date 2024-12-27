@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getBase64Image, saveBase64Image } = require("../Utility/FileUtility");
+const { getBase64Image, saveBase64Image } = require("../Utility/FileUtilityCloudStorage");
 const db = require("../../db");
 const { ObjectId } = require("mongodb");
 
