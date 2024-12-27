@@ -50,6 +50,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  console.log("Request Origin:", req.headers.origin);
+  next();
+});
 
 app.get("/test-cors", (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
