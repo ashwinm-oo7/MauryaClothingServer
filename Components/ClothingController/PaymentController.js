@@ -11,7 +11,7 @@ router.get("/generate-upi-link", (req, res) => {
   }
 
   const AdminupiId = "ashwinmaurya@oksbi";
-  const name = "Ashwini kumar Maurya"; // Replace with your name
+  const name = "ASHWINI KUMAR RAJBALI MAURYA"; // Replace with your name
   const note = "Good Service";
 
   const upiLink = `upi://pay?pa=${AdminupiId}&pn=${name}&am=${amount}&tn=${note}&cu=INR`;
