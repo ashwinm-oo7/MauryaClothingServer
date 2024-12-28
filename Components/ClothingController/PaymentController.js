@@ -4,6 +4,19 @@ const db = require("../../db");
 const { ObjectId } = require("mongodb");
 const nodemailer = require("nodemailer");
 
+router.get("/generate-upi-link", (req, res) => {
+  const { amount, upiId } = req.query;
+  if (!amount || !upiId) {
+    return res.status(400).json({ error: "Amount and UPI ID are required" });
+  }
+
+  const AdminupiId = "ashwinmaurya@oksbi";
+  const name = "Ashwini kumar Maurya"; // Replace with your name
+  const note = "Good Service";
+
+  const upiLink = `upi://pay?pa=${AdminupiId}&pn=${name}&am=${amount}&tn=${note}&cu=INR`;
+  res.json({ upiLink });
+});
 // Route to add payment details
 router.post("/add", async (req, res) => {
   try {
