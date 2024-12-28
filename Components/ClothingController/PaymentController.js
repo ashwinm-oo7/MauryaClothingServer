@@ -2,20 +2,55 @@ const express = require("express");
 const router = express.Router();
 const db = require("../../db");
 const { ObjectId } = require("mongodb");
-const nodemailer = require("nodemailer");
+const QRCode = require("qrcode");
 
-router.get("/generate-upi-link", (req, res) => {
-  const { amount, upiId } = req.query;
-  if (!amount || !upiId) {
-    return res.status(400).json({ error: "Amount and UPI ID are required" });
+const AdminupiId = "9702359576@ptsbi";
+const name = "ASHISH RAJBALI MAURYA"; // Replace with your name
+const note = "Good Service";
+
+router.get("/generate-upi-link", async (req, res) => {
+  try {
+    const { amount } = req.query;
+
+    // Validate presence of amount
+    if (!amount) {
+      return res.status(400).json({ error: "Amount is required" });
+    }
+
+    // Validate that amount is a positive number
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      return res
+        .status(400)
+        .json({ error: "Invalid amount. Amount must be a positive number." });
+    }
+
+    // Construct UPI link
+    const upiLink = `upi://pay?pa=${encodeURIComponent(
+      AdminupiId
+    )}&pn=${encodeURIComponent(name)}&am=${encodeURIComponent(
+      parsedAmount
+    )}&tn=${encodeURIComponent(note)}&cu=INR`;
+
+    // Generate QR code for the UPI payment link
+    QRCode.toDataURL(upiLink, (err, qrCodeDataUrl) => {
+      if (err) {
+        console.error("QR Code generation error:", err);
+        return res.status(500).json({ error: "Failed to generate QR code" });
+      }
+
+      // Respond with the UPI link and QR code data URL
+      res.status(200).json({
+        upiLink,
+        qrCode: qrCodeDataUrl,
+      });
+    });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    res
+      .status(500)
+      .json({ error: "An unexpected error occurred. Please try again later." });
   }
-
-  const AdminupiId = "ashwinmaurya@oksbi";
-  const name = "ASHWINI KUMAR RAJBALI MAURYA"; // Replace with your name
-  const note = "Good Service";
-
-  const upiLink = `upi://pay?pa=${AdminupiId}&pn=${name}&am=${amount}&tn=${note}&cu=INR`;
-  res.json({ upiLink });
 });
 // Route to add payment details
 router.post("/add", async (req, res) => {
@@ -38,6 +73,7 @@ router.post("/add", async (req, res) => {
       paymentUpdate,
       products,
       mobileNumber,
+      transactionId,
     } = req.body;
 
     // Validate the payment details
@@ -62,95 +98,6 @@ router.post("/add", async (req, res) => {
       timeZone: "Asia/Kolkata",
     });
     const currentYear = new Date().getFullYear().toString().slice(-2);
-    // 888888888888888888888888888888888888
-    //   const pdfData = `
-    //   <html>
-    //     <head>
-    //       <title>Invoice</title>
-    //       <style>
-    //         body { font-family: Arial, sans-serif; }
-    //         .invoice { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; }
-    //         .header { text-align: center; }
-    //         .details { margin-top: 20px; }
-    //         .footer { text-align: center; margin-top: 20px; }
-    //       </style>
-    //     </head>
-    //     <body>
-    //       <div class="invoice">
-    //         <div class="header">
-    //           <h1>Invoice</h1>
-    //           <p>Date: ${createdAt}</p>
-    //           <p>Invoice Number: ${currentYear}/${nextInvoiceNumber
-    //             .toString()
-    //             .padStart(4, "0")}</p>
-    //         </div>
-    //         <div class="details">
-    //           <h2>Billing Details</h2>
-    //           <p>Name: ${name}</p>
-    //           <p>Email: ${userEmail}</p>
-    //           <p>Delivery Address: ${deliveryAddress}</p>
-    //           <h3>Items</h3>
-    //           <ul>
-    //             ${products
-    //               .map(
-    //                 (product) =>
-    //                   `<li>${product.name} - ${product.quantity} x ${product.price}</li>`
-    //               )
-    //               .join("")}
-    //           </ul>
-    //           <p>Subtotal: $${SubTotal}</p>
-    //           <p>Tax: $${Tax}</p>
-    //           <p>Total Amount Paid: $${amountPaid}</p>
-    //         </div>
-    //         <div class="footer">
-    //           <p>Thank you for your purchase!</p>
-    //         </div>
-    //       </div>
-    //     </body>
-    //   </html>
-    // `;
-    //   const pdf = await new Promise((resolve, reject) => {
-    //     htmlToPdf.create(pdfData, {}).toBuffer((err, buffer) => {
-    //       if (err) {
-    //         reject(err);
-    //       } else {
-    //         resolve(buffer);
-    //       }
-    //     });
-    //   });
-
-    //   const transporter = nodemailer.createTransport({
-    //     service: "gmail",
-    //     auth: {
-    // user: process.env.Email_UserName,
-    // pass: process.env.Email_Password,
-    //     },
-    //   });
-
-    //   const mailOptions = {
-    //     from: "your-email@gmail.com",
-    //     to: userEmail,
-    //     subject: "Invoice for Your Purchase",
-    //     text: "Please find attached the invoice for your recent purchase.",
-    //     attachments: [
-    //       {
-    //         filename: "invoice.pdf",
-    //         content: pdf,
-    //         encoding: "base64",
-    //       },
-    //     ],
-    //   };
-
-    //   transporter.sendMail(mailOptions, (error, info) => {
-    //     if (error) {
-    //       console.error("Error sending email:", error);
-    //       res.status(500).send("Failed to send email");
-    //     } else {
-    //       console.log("Email sent: " + info.response);
-    //       res.status(200).send("Email sent successfully");
-    //     }
-    //   });
-
     const dbInstance = await db.connectDatabase();
     const db1 = await dbInstance.getDb();
     const paymentCollection = db1.collection("order");
@@ -192,6 +139,8 @@ router.post("/add", async (req, res) => {
       } else if (upiID) {
         // Save UPI ID
         paymentWithDate.upiID = upiID;
+      } else if (transactionId) {
+        paymentWithDate.transactionId = transactionId;
       }
 
       const result = await paymentCollection.insertOne(paymentWithDate);
