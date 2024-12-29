@@ -8,13 +8,17 @@ const { forgotTemplate, signUP } = require("../Template/Template.js");
 const useragent = require("express-useragent");
 router.use(useragent.express());
 const crypto = require("crypto");
-
+const { OAuth2Client } = require("google-auth-library");
+const client = new OAuth2Client(
+  "336125404447-90vb4ndqndqtf1va7444lcl9us1quqle.apps.googleusercontent.com"
+);
+console.log("client", client);
 // Middleware for rate limiting
 const rateLimit = require("express-rate-limit");
 
 const signUpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1, // Limit each IP to 5 requests per windowMs
+  max: 10, // Limit each IP to 5 requests per windowMs
   message: "Too many sign-up attempts from this IP, please try again later.",
 });
 
@@ -23,6 +27,101 @@ function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000);
 }
 
+router.post("/google-signin", async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, given_name, family_name, picture } = payload;
+    console.log("payload", payload);
+    const dbInstance = await db.connectDatabase();
+    const db1 = await dbInstance.getDb();
+    const customerCollection = db1.collection("customer");
+    const loginTimePeriodCollection = db1.collection("loginTimePeriod");
+
+    // Check if the email exists in the database
+    let user = await customerCollection.findOne({ email });
+
+    // Check if user exists or create a new user in the database
+    if (!user) {
+      user = await customerCollection.insertOne({
+        email,
+        firstName: given_name,
+        lastName: family_name,
+        picture,
+        createdAt: new Date().toISOString(),
+        verify: true, // assuming user is verified
+      });
+    }
+    const update_at = new Date();
+    try {
+      const activeSession = await loginTimePeriodCollection.findOne(
+        { userId: user._id, logoutTime: null },
+        { sort: { loginTime: -1 } }
+      );
+
+      if (activeSession) {
+        await loginTimePeriodCollection.updateOne(
+          { _id: activeSession._id },
+          { $set: { logoutTime: update_at } }
+        );
+        console.log(`Previous session logged out for userID: ${user._id}`);
+      }
+    } catch (sessionError) {
+      console.warn(
+        "Issue with logging out previous session. Proceeding with new login."
+      );
+    }
+
+    await customerCollection.updateOne(
+      { email },
+      { $set: { lastLogin: update_at } }
+    );
+
+    const latestLoginRecord = await loginTimePeriodCollection.findOne(
+      { userId: user._id },
+      { sort: { loginTime: -1 } }
+    );
+
+    // Determine the new login count
+    const newLoginCount = latestLoginRecord
+      ? latestLoginRecord.loginCount + 1
+      : 1;
+
+    // Record login time in loginTimePeriod collection
+    const loginRecord = {
+      email,
+      userId: user._id,
+      loginTime: update_at,
+      logoutTime: null,
+      device: {
+        family: req.useragent.platform || "Unknown",
+        model: req.useragent.os || "Unknown",
+      },
+      loginCount: newLoginCount, // Add login count to the record
+    };
+
+    await loginTimePeriodCollection.insertOne(loginRecord);
+    console.log(
+      `Login recorded for userId ${user._id} with loginCount: ${newLoginCount}`
+    );
+    // Respond with user details
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      picture: user.picture,
+    });
+  } catch (error) {
+    console.error("Error verifying Google token:", error);
+    res.status(400).json({ message: "Invalid Google token." });
+  }
+});
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
