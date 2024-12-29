@@ -54,6 +54,7 @@ router.post("/google-signin", async (req, res) => {
         firstName: given_name,
         lastName: family_name,
         picture,
+        signupMethod: "google",
         createdAt: new Date().toISOString(),
         verify: true, // assuming user is verified
       });
@@ -320,6 +321,7 @@ router.post("/signup", signUpLimiter, async (req, res) => {
     });
     const entity = req.body;
     entity.createdAt = createdAt;
+    entity.signupMethod = "custom";
     // console.log(entity.password);
 
     let encPwd = "";
@@ -464,10 +466,18 @@ router.post("/login", async (req, res) => {
       // If user not found in the database, return 404 status
       return res.status(404).json("Customer not found");
     }
-
+    if (user.signupMethod === "google") {
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message:
+            "This account was created using Google Sign-In. Please log in using Google.",
+        });
+    }
     // Decrypt the password
     let dbUserPass = await EncryptionDecryption.decrypt(user.password);
-
+    console.log(dbUserPass, password);
     if (dbUserPass !== password) {
       return res.status(401).json("Credentials issue!");
     }
